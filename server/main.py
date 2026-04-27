@@ -345,6 +345,148 @@ def get_monthly_trends(
     result.sort(key=lambda x: x['month'])
     return result
 
+class RestockPurchaseOrderRequest(BaseModel):
+    sku: str
+    supplier_name: str
+    quantity: int
+    unit_cost: float
+    expected_delivery_date: str
+    notes: Optional[str] = None
+
+
+@app.post("/api/restocking/purchase-orders")
+def create_restock_purchase_order(request: RestockPurchaseOrderRequest):
+    """Create a purchase order from a restocking recommendation."""
+    item = next((i for i in inventory_items if i['sku'] == request.sku), None)
+    if not item:
+        raise HTTPException(status_code=404, detail=f"SKU {request.sku} not found")
+
+    if request.quantity <= 0:
+        raise HTTPException(status_code=400, detail="Quantity must be positive")
+    if request.unit_cost < 0:
+        raise HTTPException(status_code=400, detail="Unit cost cannot be negative")
+
+    from datetime import datetime
+    new_po = {
+        'id': f'PO-{len(purchase_orders) + 1:04d}',
+        'backlog_item_id': '',
+        'sku': request.sku,
+        'item_name': item['name'],
+        'supplier_name': request.supplier_name,
+        'quantity': request.quantity,
+        'unit_cost': request.unit_cost,
+        'total_cost': round(request.quantity * request.unit_cost, 2),
+        'expected_delivery_date': request.expected_delivery_date,
+        'status': 'pending',
+        'created_date': datetime.utcnow().isoformat() + 'Z',
+        'notes': request.notes,
+        'source': 'restocking',
+    }
+    purchase_orders.append(new_po)
+    return new_po
+
+
+@app.get("/api/restocking/recommendations")
+def get_restocking_recommendations(
+    warehouse: Optional[str] = None,
+    category: Optional[str] = None,
+    budget: Optional[float] = None,
+):
+    """Return purchase-order recommendations driven by stock vs reorder point.
+
+    Algorithm:
+      target = round(reorder_point * 1.5)  -- par stock
+      qty   = max(0, target - quantity_on_hand)
+      lift  = max(0, forecasted_demand - current_demand) when trend == 'increasing'
+      recommended_qty = qty + lift
+      estimated_cost  = recommended_qty * unit_cost
+    Items are sorted by priority (deepest shortfall first), then walked in order
+    against the budget. Items that fit go into `recommendations`, the rest into
+    `deferred`.
+    """
+
+    items = apply_filters(inventory_items, warehouse=warehouse, category=category)
+    forecast_by_sku = {f['item_sku']: f for f in demand_forecasts}
+
+    candidates = []
+    for item in items:
+        on_hand = item.get('quantity_on_hand', 0)
+        reorder_point = item.get('reorder_point', 0)
+        if on_hand >= reorder_point:
+            continue
+
+        target = round(reorder_point * 1.5)
+        base_qty = max(0, target - on_hand)
+
+        forecast = forecast_by_sku.get(item['sku'])
+        forecast_lift = 0
+        if forecast and forecast.get('trend') == 'increasing':
+            forecast_lift = max(0, forecast.get('forecasted_demand', 0) - forecast.get('current_demand', 0))
+
+        recommended_qty = base_qty + forecast_lift
+        if recommended_qty == 0:
+            continue
+
+        unit_cost = item.get('unit_cost', 0)
+        estimated_cost = round(recommended_qty * unit_cost, 2)
+        shortfall_ratio = (reorder_point - on_hand) / reorder_point if reorder_point > 0 else 0
+
+        if shortfall_ratio >= 0.5:
+            priority = 'high'
+        elif shortfall_ratio >= 0.2:
+            priority = 'medium'
+        else:
+            priority = 'low'
+
+        candidates.append({
+            'sku': item['sku'],
+            'name': item['name'],
+            'category': item['category'],
+            'warehouse': item['warehouse'],
+            'quantity_on_hand': on_hand,
+            'reorder_point': reorder_point,
+            'recommended_quantity': recommended_qty,
+            'unit_cost': unit_cost,
+            'estimated_cost': estimated_cost,
+            'priority': priority,
+            'shortfall_ratio': round(shortfall_ratio, 3),
+            'forecast_lift': forecast_lift,
+            'trend': forecast.get('trend') if forecast else None,
+        })
+
+    candidates.sort(key=lambda c: (-c['shortfall_ratio'], -c['estimated_cost']))
+
+    recommendations = []
+    deferred = []
+    total_cost = 0.0
+    deferred_cost = 0.0
+
+    if budget is None or budget <= 0:
+        recommendations = candidates
+        total_cost = round(sum(c['estimated_cost'] for c in candidates), 2)
+    else:
+        running = 0.0
+        for c in candidates:
+            if running + c['estimated_cost'] <= budget:
+                recommendations.append(c)
+                running += c['estimated_cost']
+            else:
+                deferred.append(c)
+                deferred_cost += c['estimated_cost']
+        total_cost = round(running, 2)
+        deferred_cost = round(deferred_cost, 2)
+
+    return {
+        'budget': budget,
+        'total_cost': total_cost,
+        'deferred_cost': deferred_cost,
+        'item_count': len(recommendations),
+        'deferred_count': len(deferred),
+        'recommendations': recommendations,
+        'deferred': deferred,
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
