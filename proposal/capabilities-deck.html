@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Capabilities Presentation — Meridian Components</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #a100ff;
+    --accent-deep: #7500c0;
+    --panel: #f5f0fa;
+    --border: #e5d9f2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    overflow: hidden;
+  }
+  .deck { height: 100vh; width: 100vw; position: relative; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 72px 96px;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .slide.active { display: flex; }
+  .slide h1 {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  .title-slide h1::after,
+  .closer h1::after {
+    content: " >";
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .slide h2 {
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 32px;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+  .slide h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .slide p, .slide li {
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--fg);
+    margin-bottom: 12px;
+  }
+  .slide .muted { color: var(--muted); font-size: 18px; }
+  .slide .lead { font-size: 28px; line-height: 1.4; max-width: 900px; }
+  ul { list-style: none; padding-left: 0; }
+  ul li { padding-left: 28px; position: relative; }
+  ul li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 14px;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 16px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    border-radius: 8px;
+  }
+  .card h3 { color: var(--accent); }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .phase {
+    background: var(--panel);
+    border-left: 4px solid var(--accent);
+    padding: 20px 24px;
+    border-radius: 4px;
+  }
+  .phase .label { color: var(--accent); font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .phase .weeks { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+  .phase .what { font-size: 18px; line-height: 1.4; }
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 20px; }
+  th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  th { color: var(--accent); font-weight: 600; }
+  .footer {
+    position: absolute;
+    bottom: 24px;
+    left: 96px;
+    right: 96px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .nav {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+  .nav button {
+    background: var(--panel);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .nav button:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .counter {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    font-size: 14px;
+    z-index: 10;
+  }
+  .title-slide { text-align: left; }
+  .title-slide .meta { color: var(--muted); font-size: 20px; margin-top: 32px; }
+  .accent { color: var(--accent); }
+  .big-number { font-size: 96px; font-weight: 700; color: var(--accent); line-height: 1; }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- 1. Title -->
+  <section class="slide title-slide active">
+    <h1>Modernizing Meridian's<br>Inventory Dashboard</h1>
+    <p class="lead muted">Capabilities Presentation · RFP MC-2026-0417</p>
+    <p class="meta">[Firm Name] · April 2026</p>
+  </section>
+
+  <!-- 2. The problem -->
+  <section class="slide">
+    <h2>What we heard</h2>
+    <ul>
+      <li>Operations runs the business through a dashboard that <span class="accent">isn't carrying its weight</span></li>
+      <li>Reports module has known defects — eight logged, likely more</li>
+      <li>Restocking decisions still happen in spreadsheets</li>
+      <li>IT has paused changes because there's no test coverage</li>
+      <li>Previous vendor left work unfinished, documentation thin</li>
+    </ul>
+  </section>
+
+  <!-- 3. Stakes -->
+  <section class="slide">
+    <h2>Why this matters</h2>
+    <p class="lead">Three warehouses. ~180 people. ~$9.6M revenue running through this dashboard daily.</p>
+    <p class="lead" style="margin-top: 24px;">Tokyo team is locked out of i18n. London and SF live with broken Reports. Tanaka's team plans restocking in Excel.</p>
+    <p class="lead muted" style="margin-top: 32px;">Every week the dashboard stays broken is a week of operational tax.</p>
+  </section>
+
+  <!-- 4. Our principles -->
+  <section class="slide">
+    <h2>Our approach — three principles</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Unblock IT first</h3>
+        <p>Tests in week 2, not month 5. Every fix lands behind a green build.</p>
+      </div>
+      <div class="card">
+        <h3>Fix before adding</h3>
+        <p>R1 Reports remediation before R2 Restocking. Visible wins inside the first month.</p>
+      </div>
+      <div class="card">
+        <h3>Document as we go</h3>
+        <p>R4 architecture doc starts week 1, lives in the repo, refreshed continuously.</p>
+      </div>
+      <div class="card">
+        <h3>Surface risk in writing</h3>
+        <p>Weekly status, named risks, no surprises in week 12.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Sequencing -->
+  <section class="slide">
+    <h2>The sequencing call</h2>
+    <p class="lead">Meridian listed R3 (testing) fourth. We'd ship it <span class="accent">first</span>.</p>
+    <p class="lead" style="margin-top: 24px;">IT is the gatekeeper. Without tests, Reports fixes recreate the previous vendor's pattern: code lands, regressions follow, IT pushes back.</p>
+    <p class="lead" style="margin-top: 24px;"><span class="accent">Tests aren't the polish — they're the unlock.</span></p>
+  </section>
+
+  <!-- 6. Scope summary -->
+  <section class="slide">
+    <h2>Scope at a glance</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Item</th><th>Approach</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>R1</td><td>Reports remediation</td><td>Triage in week 1, fix iteratively behind tests</td></tr>
+        <tr><td>R2</td><td>Restocking view</td><td>FastAPI service + Vue view, design checkpoint with Tanaka in week 3</td></tr>
+        <tr><td>R3</td><td>Browser tests</td><td>Playwright, ships first, grows through engagement</td></tr>
+        <tr><td>R4</td><td>Architecture doc</td><td>Living HTML doc, drafted week 1, finalized at handoff</td></tr>
+        <tr><td>D1–D3</td><td>UI / i18n / dark mode</td><td>In-scope under T&M-NTE if budget permits</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 7. Timeline -->
+  <section class="slide">
+    <h2>Timeline — 19 weeks to go-live</h2>
+    <div class="timeline">
+      <div class="phase">
+        <div class="label">Phase 1</div>
+        <div class="weeks">Weeks 1–2 · May</div>
+        <div class="what">Foundations<br>R3 harness, R4 draft, defect triage</div>
+      </div>
+      <div class="phase">
+        <div class="label">Phase 2</div>
+        <div class="weeks">Weeks 3–6 · June</div>
+        <div class="what">R1 fixes ship iteratively. R2 design checkpoint week 3.</div>
+      </div>
+      <div class="phase">
+        <div class="label">Phase 3</div>
+        <div class="weeks">Weeks 7–12 · Jul–Aug</div>
+        <div class="what">R2 build end-to-end. Mid-phase demo week 9.</div>
+      </div>
+      <div class="phase">
+        <div class="label">Phase 4</div>
+        <div class="weeks">Weeks 13–19 · Aug–Sep</div>
+        <div class="what">D1/D2/D3, UAT, IT handoff. <span class="accent">Two-week buffer</span> at the end.</div>
+      </div>
+    </div>
+    <p class="lead muted" style="margin-top: 40px;">Hard go-live: September 30, 2026.</p>
+  </section>
+
+  <!-- 8. Critical path -->
+  <section class="slide">
+    <h2>Where the schedule lives or dies</h2>
+    <p class="lead">The single longest dependency:</p>
+    <p class="lead accent" style="margin: 24px 0; font-size: 32px;">R2 design checkpoint (week 3) → R2 build (weeks 7–12) → UAT (weeks 15–16)</p>
+    <p class="lead">If Tanaka's team can drive a one-hour design session in week 3, the rest of the plan holds.</p>
+    <p class="lead muted" style="margin-top: 24px;">We name this risk in the proposal, not in week 8.</p>
+  </section>
+
+  <!-- 9. Commercials -->
+  <section class="slide">
+    <h2>Commercials</h2>
+    <p class="lead"><span class="accent">T&M with Not-To-Exceed</span> — phased ceilings, no rolling between phases.</p>
+    <ul style="margin-top: 32px;">
+      <li>Pay for actual time, capped per phase</li>
+      <li>If we approach a ceiling, you hear about it in writing — before we hit it</li>
+      <li>Underspend stays with Meridian</li>
+      <li>Change control: written, with three-day turnaround. Sub-half-day fixes don't generate paperwork.</li>
+    </ul>
+  </section>
+
+  <!-- 10. Why us -->
+  <section class="slide">
+    <h2>Why us</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>We've inherited messy work</h3>
+        <p>Light docs, mixed conventions, defects logged but not triaged. We know the pattern and how to land it cleanly.</p>
+      </div>
+      <div class="card">
+        <h3>Sequencing as differentiator</h3>
+        <p>Tests early. Risk in writing. Incremental shipping. Meridian feels progress every week.</p>
+      </div>
+      <div class="card">
+        <h3>Stack fit</h3>
+        <p>Vue 3 + FastAPI + small-team operational tooling is squarely our zone.</p>
+      </div>
+      <div class="card">
+        <h3>Honest communication</h3>
+        <p>Weekly written status. Named risks. No surprises at the milestone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. Risks we name up front -->
+  <section class="slide">
+    <h2>Risks — surfaced now, not later</h2>
+    <table>
+      <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>Brand assets unavailable</td><td>D1 reduces to component cleanup</td></tr>
+        <tr><td>Reports defect count grows</td><td>T&M-NTE absorbs; weekly reporting</td></tr>
+        <tr><td>VP Ops unavailable for week-3 checkpoint</td><td>Named risk; backup decision-maker requested</td></tr>
+        <tr><td>Sept 30 deadline tight</td><td>Two-week buffer; D-items deferable</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 12. What we ask of Meridian -->
+  <section class="slide">
+    <h2>What we ask of Meridian</h2>
+    <ul>
+      <li>Three-stakeholder kickoff: Procurement, Operations, IT in one room</li>
+      <li>Repository and environment access on day one</li>
+      <li>Brand system assets within first two weeks (drives D1 scope)</li>
+      <li>VP Operations' time at the week-3 R2 design checkpoint</li>
+      <li>A named alternate decision-maker for travel and PTO coverage</li>
+    </ul>
+  </section>
+
+  <!-- 13. Close -->
+  <section class="slide closer">
+    <h1>Let's get to work</h1>
+    <p class="lead" style="margin-top: 32px;">Kickoff week of May 18. Go-live September 30.</p>
+    <p class="lead muted" style="margin-top: 24px;">Questions, push-back, alternative views — all welcome.</p>
+    <p class="meta" style="margin-top: 64px;">[Firm Name] · [Contact] · [Email]</p>
+  </section>
+
+</div>
+
+<div class="counter"><span id="cur">1</span> / <span id="total">13</span></div>
+<div class="nav">
+  <button onclick="prev()">←</button>
+  <button onclick="next()">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+  document.getElementById('total').textContent = slides.length;
+  function show(i) {
+    slides.forEach((s, n) => s.classList.toggle('active', n === i));
+    document.getElementById('cur').textContent = i + 1;
+  }
+  function next() { if (idx < slides.length - 1) { idx++; show(idx); } }
+  function prev() { if (idx > 0) { idx--; show(idx); } }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+</script>
+
+</body>
+</html>
