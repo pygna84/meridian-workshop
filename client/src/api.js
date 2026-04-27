@@ -76,6 +76,23 @@ export const api = {
     return response.data
   },
 
+  async createRestockPurchaseOrder(payload) {
+    const response = await axios.post(`${API_BASE_URL}/restocking/purchase-orders`, payload)
+    return response.data
+  },
+
+  async getRestockingRecommendations(filters = {}) {
+    const params = new URLSearchParams()
+    if (filters.warehouse && filters.warehouse !== 'all') params.append('warehouse', filters.warehouse)
+    if (filters.category && filters.category !== 'all') params.append('category', filters.category)
+    if (filters.budget !== undefined && filters.budget !== null && filters.budget !== '') {
+      params.append('budget', filters.budget)
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/restocking/recommendations?${params.toString()}`)
+    return response.data
+  },
+
   async getSpendingSummary() {
     const response = await axios.get(`${API_BASE_URL}/spending/summary`)
     return response.data
