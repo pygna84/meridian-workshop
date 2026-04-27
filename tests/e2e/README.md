@@ -11,9 +11,7 @@ before merge.
 | `smoke.spec.js` | App boots, primary nav routes, FilterBar reset state |
 | `reports.spec.js` | Reports filters reshape data, May-key regression, locale + currency switch, accessibility on chart bars, empty-state messaging |
 | `warehouse-switching.spec.js` | Warehouse selector filters Inventory, persists across navigation, reset clears |
-
-Restocking (R2) coverage is added in a follow-up once that PR is merged to
-main, since the harness branches off main and Restocking isn't there yet.
+| `restocking.spec.js` | Recommendations render, budget split, warehouse filter, Create PO modal prefill + submit, locale switch |
 
 ## Running locally
 
@@ -45,7 +43,7 @@ servers because that matches the developer workflow.
 
 ## Known gaps (next iteration)
 
-- Restocking flow + Create-PO modal once R2 is merged.
 - API-level tests for the new restocking endpoints.
 - CI wiring (GitHub Actions workflow) so PRs report status checks.
 - Visual regression for the Reports bar chart.
+- Sticky "PO created" state once a `GET /api/restocking/purchase-orders?source=restocking` endpoint exists (today the badge only persists in component memory).

@@ -15,6 +15,7 @@ test.describe('App smoke', () => {
       { text: 'Finance', path: '/spending' },
       { text: 'Demand Forecast', path: '/demand' },
       { text: 'Reports', path: '/reports' },
+      { text: 'Restocking', path: '/restocking' },
     ]
 
     await page.goto('/')
