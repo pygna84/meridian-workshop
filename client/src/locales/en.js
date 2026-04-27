@@ -392,6 +392,35 @@ export default {
     selectLanguage: 'Select Language'
   },
 
+  // Theme toggle
+  theme: {
+    switchToDark: 'Switch to dark mode',
+    switchToLight: 'Switch to light mode'
+  },
+
+  // Backlog
+  backlog: {
+    title: 'Backlog',
+    description: 'Items waiting on stock or replenishment',
+    table: {
+      orderId: 'Order ID',
+      sku: 'SKU',
+      itemName: 'Item Name',
+      quantityNeeded: 'Quantity Needed',
+      quantityAvailable: 'Quantity Available',
+      shortage: 'Shortage',
+      daysDelayed: 'Days Delayed',
+      priority: 'Priority',
+      status: 'Status',
+      action: 'Action'
+    },
+    statusOpen: 'Open',
+    statusOrdered: 'PO Created',
+    createPo: 'Create PO',
+    empty: 'No backlog items right now.',
+    unitsShort: 'units short'
+  },
+
   // Common
   common: {
     loading: 'Loading...',
@@ -402,6 +431,7 @@ export default {
     save: 'Save',
     cancel: 'Cancel',
     search: 'Search',
+    actions: 'Actions',
     filter: 'Filter',
     export: 'Export',
     items: 'items'

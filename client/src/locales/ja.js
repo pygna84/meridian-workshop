@@ -392,12 +392,42 @@ export default {
     selectLanguage: '言語を選択'
   },
 
+  // Theme toggle
+  theme: {
+    switchToDark: 'ダークモードに切替',
+    switchToLight: 'ライトモードに切替'
+  },
+
+  // Backlog
+  backlog: {
+    title: 'バックログ',
+    description: '在庫補充待ちの品目',
+    table: {
+      orderId: '注文ID',
+      sku: 'SKU',
+      itemName: '品目名',
+      quantityNeeded: '必要数量',
+      quantityAvailable: '在庫数量',
+      shortage: '不足',
+      daysDelayed: '遅延日数',
+      priority: '優先度',
+      status: 'ステータス',
+      action: 'アクション'
+    },
+    statusOpen: '未対応',
+    statusOrdered: '発注済み',
+    createPo: '発注作成',
+    empty: '現在バックログ品目はありません。',
+    unitsShort: '単位不足'
+  },
+
   // Common
   common: {
     loading: '読み込み中...',
     error: 'エラー',
     noData: 'データがありません',
     viewDetails: '詳細を見る',
+    actions: 'アクション',
     close: '閉じる',
     save: '保存',
     cancel: 'キャンセル',
